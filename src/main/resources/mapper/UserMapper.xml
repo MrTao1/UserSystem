@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybstis.org//DTD Mspper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.UserDao">
+    <resultMap type="User" id="userResultMap">
+        <id property="userId" column="user_id"/>
+        <result property="userName" column="name"/>
+        <result property="userEmail" column="email"/>
+        <result property="userPassword" column="password"/>
+        <result property="userCreateTime" column="create_time"/>
+        <result property="userUpdateTime" column="update_time"/>
+    </resultMap>
+    <insert id="addUser" parameterType="User">
+        INSERT INTO user(user_id,name,email,password) VALUE (#{userId},#{userName},#{userEmail},#{userPassword})
+</insert>
+
+    <delete id="deleteUserById" parameterType="long">
+        DELETE FROM user WHERE user_id=#{userId}
+    </delete>
+
+    <update id="updateUser" parameterType="User">
+        UPDATE user
+        SET NAME = #{userName},email = #{userEmail},password = #{userPassword}
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="queryUserById" resultMap="userResultMap" parameterType="long">
+        SELECT user_id,name,email,password,create_time,update_time
+        FROM user
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="checkUser" resultMap="userResultMap" parameterType="String">
+        SELECT user_id,name,email,password,create_time,update_time
+        FROM user
+        WHERE name = #{userName}
+    </select>
+
+    <!-- 分页-条件查询 -->
+    <select id="queryByPage" parameterType="com.pojo.User" resultMap="userResultMap">
+        SELECT *
+        FROM user
+        WHERE 1=1
+        <if test="userName != null">
+            AND name LIKE CONCAT('%', #{userName}, '%')
+        </if>
+        <if test="userEmail != null">
+            AND email LIKE CONCAT('%', #{userEmail}, '%')
+        </if>
+    </select>
+
+    <!-- 用户登录的方法 -->
+    <select id="login" resultMap="userResultMap">
+        SELECT *
+        FROM user
+        WHERE name = #{userName} AND password = #{userPassword} limit 1
+    </select>
+
+</mapper>
